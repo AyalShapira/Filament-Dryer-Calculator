@@ -5,7 +5,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>יועץ ייבוש פילמנט</title>
+  <base href="./">
   <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon.png" type="image/png">
   <style>
     body {
       direction: rtl;
@@ -44,6 +46,11 @@
       margin-right: auto;
     }
   </style>
+  <script>
+    if (location.pathname !== '/' && !location.pathname.endsWith('/Filament-Dryer-Calculator/')) {
+      location.replace('/Filament-Dryer-Calculator/');
+    }
+  </script>
 </head>
 <body>
 
@@ -93,7 +100,6 @@
         "<p><strong>חומר:</strong> " + material + " | <strong>משקל:</strong> " + weight + " גרם</p>";
     };
 
-    // Register Service Worker for PWA support
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js');
     }
