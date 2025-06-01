@@ -1,0 +1,103 @@
+
+<!DOCTYPE html>
+<html lang="he">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>יועץ ייבוש פילמנט</title>
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    body {
+      direction: rtl;
+      font-family: sans-serif;
+      padding: 20px;
+      background-color: #f5f5f5;
+      margin: 0;
+    }
+    h1 {
+      text-align: center;
+    }
+    label, select, input, button {
+      display: block;
+      width: 100%;
+      max-width: 400px;
+      margin: 10px auto;
+      font-size: 1rem;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #result {
+      margin-top: 20px;
+      background: #fff;
+      padding: 15px;
+      border: 1px solid #ccc;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>יועץ ייבוש פילמנט</h1>
+
+  <label for="material">בחר חומר:</label>
+  <select id="material">
+    <option value="PLA">PLA</option>
+    <option value="PETG">PETG</option>
+  </select>
+
+  <label for="weight">משקל (גרם):</label>
+  <input type="number" id="weight" placeholder="לדוגמה 1000" min="1">
+
+  <button id="calcBtn">חשב</button>
+
+  <div id="result"></div>
+
+  <script>
+    document.getElementById('calcBtn').onclick = function() {
+      var material = document.getElementById('material').value;
+      var weight = parseInt(document.getElementById('weight').value);
+      var result = document.getElementById('result');
+      var temp = 0;
+      var time = 0;
+
+      if (!weight || weight <= 0) {
+        result.innerHTML = "<p style='color:red;'>אנא הזן משקל חוקי.</p>";
+        return;
+      }
+
+      if (material === "PLA") {
+        temp = 45;
+        time = weight > 800 ? 6 : 4;
+      } else if (material === "PETG") {
+        temp = 65;
+        time = weight > 800 ? 8 : 6;
+      }
+
+      result.innerHTML = "<h3>הנחיות:</h3>" +
+        "<ul>" +
+        "<li>לחץ M פעם אחת – קבע טמפ׳ ל-" + temp + "°C</li>" +
+        "<li>לחץ שוב M – קבע זמן ייבוש " + time + " שעות</li>" +
+        "<li>לחץ שוב M – ניתן להתעלם ממשקל</li>" +
+        "<li>הייבוש יתחיל אוטומטית</li>" +
+        "</ul>" +
+        "<p><strong>חומר:</strong> " + material + " | <strong>משקל:</strong> " + weight + " גרם</p>";
+    };
+
+    // Register Service Worker for PWA support
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
+  </script>
+
+</body>
+</html>
