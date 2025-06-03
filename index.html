@@ -17,39 +17,47 @@
     }
     h1 {
       text-align: center;
+      font-size: 1.8rem;
     }
     label, select, input, button {
       display: block;
       width: 100%;
-      max-width: 400px;
-      margin: 10px auto;
-      font-size: 1rem;
+      max-width: 500px;
+      margin: 15px auto;
+      font-size: 1.2rem;
+    }
+    input, select {
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
     }
     button {
       background-color: #4CAF50;
       color: white;
-      padding: 10px;
+      padding: 15px;
       border: none;
+      border-radius: 8px;
+      font-size: 1.2rem;
       cursor: pointer;
     }
     button:hover {
       background-color: #45a049;
     }
     #result {
-      margin-top: 20px;
+      margin-top: 30px;
       background: #fff;
-      padding: 15px;
+      padding: 20px;
       border: 1px solid #ccc;
-      max-width: 400px;
+      border-radius: 8px;
+      max-width: 500px;
       margin-left: auto;
       margin-right: auto;
+      font-size: 1.1rem;
+    }
+    ul {
+      padding-right: 20px;
     }
   </style>
-  <script>
-    if (location.pathname !== '/' && !location.pathname.endsWith('/Filament-Dryer-Calculator/')) {
-      location.replace('/Filament-Dryer-Calculator/');
-    }
-  </script>
 </head>
 <body>
 
@@ -63,48 +71,46 @@
     <option value="PA6-CF">ניילון פחמני (PA6-CF)</option>
   </select>
 
-  <label for="weight">משקל (גרם):</label>
-  <input type="number" id="weight" placeholder="לדוגמה 1000" min="1">
-
-  <button id="calcBtn">חשב</button>
+  <button id="calcBtn">חשב הנחיות ייבוש</button>
 
   <div id="result"></div>
 
   <script>
     document.getElementById('calcBtn').onclick = function() {
       var material = document.getElementById('material').value;
-      var weight = parseInt(document.getElementById('weight').value);
       var result = document.getElementById('result');
-      var temp = 0;
+      var tempLabel = "";
+      var mode = "";
       var time = 0;
 
-      if (!weight || weight <= 0) {
-        result.innerHTML = "<p style='color:red;'>אנא הזן משקל חוקי.</p>";
-        return;
-      }
-
       if (material === "PLA") {
-        temp = 45;
-        time = weight > 800 ? 6 : 4;
+        tempLabel = "כ־45°C";
+        mode = "לחיצה אחת (המסך יציג: 1)";
+        time = 4;
       } else if (material === "PETG") {
-        temp = 65;
-        time = weight > 800 ? 8 : 6;
+        tempLabel = "כ־60°C";
+        mode = "שתי לחיצות (המסך יציג: 2)";
+        time = 6;
       } else if (material === "PC") {
-        temp = 80;
-        time = weight > 800 ? 8 : 6;
+        tempLabel = "כ־75°C";
+        mode = "שלוש לחיצות (המסך יציג: 3)";
+        time = 6;
       } else if (material === "PA6-CF") {
-        temp = 75;
-        time = weight > 800 ? 8 : 6;
+        tempLabel = "כ־70°C";
+        mode = "שלוש לחיצות (המסך יציג: 3)";
+        time = 6;
       }
 
-      result.innerHTML = "<h3>הנחיות:</h3>" +
-        "<ul>" +
-        "<li>לחץ M פעם אחת – קבע טמפ׳ ל-" + temp + "°C</li>" +
-        "<li>לחץ שוב M – קבע זמן ייבוש " + time + " שעות</li>" +
-        "<li>לחץ שוב M – ניתן להתעלם ממשקל</li>" +
-        "<li>הייבוש יתחיל אוטומטית</li>" +
-        "</ul>" +
-        "<p><strong>חומר:</strong> " + material + " | <strong>משקל:</strong> " + weight + " גרם</p>";
+      result.innerHTML = `
+        <h3>הנחיות להפעלת מייבש הפילמנט:</h3>
+        <ul>
+          <li>לחץ על כפתור <strong>M</strong> ${mode}</li>
+          <li>הטמפרטורה המתאימה היא <strong>${tempLabel}</strong></li>
+          <li>לחץ שוב על <strong>M</strong> ובחר זמן ייבוש של <strong>${time} שעות</strong></li>
+          <li>לחץ שוב על <strong>M</strong> כדי לאשר והייבוש יתחיל</li>
+        </ul>
+        <p><strong>חומר:</strong> ${material}</p>
+      `;
     };
 
     if ('serviceWorker' in navigator) {
