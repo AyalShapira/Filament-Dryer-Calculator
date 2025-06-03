@@ -40,8 +40,8 @@
       font-size: 1.2rem;
       cursor: pointer;
     }
-    button:hover {
-      background-color: #45a049;
+    button.secondary {
+      background-color: #888;
     }
     #result {
       margin-top: 30px;
@@ -57,6 +57,16 @@
     ul {
       padding-right: 20px;
     }
+    #addToHomeBtn {
+      display: none;
+      background-color: #2196F3;
+      margin-top: 10px;
+    }
+    #closeBtn {
+      display: none;
+      background-color: #d9534f;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -65,52 +75,99 @@
 
   <label for="material">בחר חומר:</label>
   <select id="material">
-    <option value="PLA">PLA</option>
-    <option value="PETG">PETG</option>
-    <option value="PC">פוליקרבונט (PC)</option>
-    <option value="PA6-CF">ניילון פחמני (PA6-CF)</option>
+    <option value="PETG">PETG (פוליאתילן טרפתלט גליקול)</option>
+    <option value="PLA">PLA (חומצה פולילקטית)</option>
+    <option value="PC">PC (פוליקרבונט)</option>
+    <option value="PA6-CF">PA6-CF (ניילון מחוזק בסיבי פחמן)</option>
   </select>
 
+  <label for="weight">משקל (גרם):</label>
+  <input type="number" id="weight" placeholder="לדוגמה 1000" min="1" />
+
   <button id="calcBtn">חשב הנחיות ייבוש</button>
+  <button id="resetBtn" class="secondary" style="display:none;">איפוס</button>
+  <button id="addToHomeBtn">📲 הוסף לדף הבית</button>
+  <button id="closeBtn">❌ סגור אפליקציה</button>
 
   <div id="result"></div>
 
   <script>
-    document.getElementById('calcBtn').onclick = function() {
-      var material = document.getElementById('material').value;
-      var result = document.getElementById('result');
-      var tempLabel = "";
-      var mode = "";
-      var time = 0;
+    const defaultWeight = 1000;
+    const calcBtn = document.getElementById('calcBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const result = document.getElementById('result');
+
+    calcBtn.onclick = function() {
+      const material = document.getElementById('material').value;
+      let weight = parseInt(document.getElementById('weight').value) || defaultWeight;
+      let tempLabel = "", mode = "", baseTime = 0;
 
       if (material === "PLA") {
         tempLabel = "כ־45°C";
         mode = "לחיצה אחת (המסך יציג: 1)";
-        time = 4;
+        baseTime = 4;
       } else if (material === "PETG") {
         tempLabel = "כ־60°C";
         mode = "שתי לחיצות (המסך יציג: 2)";
-        time = 6;
+        baseTime = 6;
       } else if (material === "PC") {
         tempLabel = "כ־75°C";
         mode = "שלוש לחיצות (המסך יציג: 3)";
-        time = 6;
+        baseTime = 6;
       } else if (material === "PA6-CF") {
         tempLabel = "כ־70°C";
         mode = "שלוש לחיצות (המסך יציג: 3)";
-        time = 6;
+        baseTime = 12;
       }
+
+      let adjustedTime = Math.round((baseTime * weight) / 1000);
 
       result.innerHTML = `
         <h3>הנחיות להפעלת מייבש הפילמנט:</h3>
         <ul>
           <li>לחץ על כפתור <strong>M</strong> ${mode}</li>
           <li>הטמפרטורה המתאימה היא <strong>${tempLabel}</strong></li>
-          <li>לחץ שוב על <strong>M</strong> ובחר זמן ייבוש של <strong>${time} שעות</strong></li>
+          <li>לחץ שוב על <strong>M</strong> ובחר זמן ייבוש של <strong>${adjustedTime} שעות</strong></li>
           <li>לחץ שוב על <strong>M</strong> כדי לאשר והייבוש יתחיל</li>
         </ul>
-        <p><strong>חומר:</strong> ${material}</p>
+        <p><strong>חומר:</strong> ${material} | <strong>משקל:</strong> ${weight} גרם</p>
       `;
+
+      resetBtn.style.display = "block";
+    };
+
+    resetBtn.onclick = function() {
+      document.getElementById('material').selectedIndex = 0;
+      document.getElementById('weight').value = "";
+      result.innerHTML = "";
+      resetBtn.style.display = "none";
+    };
+
+    const addToHomeBtn = document.getElementById("addToHomeBtn");
+    let deferredPrompt;
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      addToHomeBtn.style.display = "block";
+    });
+
+    addToHomeBtn.onclick = () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(() => {
+          deferredPrompt = null;
+          addToHomeBtn.style.display = "none";
+        });
+      }
+    };
+
+    const closeBtn = document.getElementById("closeBtn");
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      closeBtn.style.display = "block";
+    }
+
+    closeBtn.onclick = () => {
+      window.close();
     };
 
     if ('serviceWorker' in navigator) {
